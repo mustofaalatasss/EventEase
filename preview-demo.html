@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventEase - Interactive Live Demo Preview</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8f9fa; }
+        .event-card { transition: transform 0.2s ease, box-shadow 0.2s ease; border-radius: 12px; }
+        .event-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important; }
+        .badge-pill { border-radius: 50rem; }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm px-3">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="#dashboard" onclick="navigate('dashboard')">
+                <i class="bi bi-calendar2-check-fill me-2 fs-4"></i>
+                <span class="text-white">Event</span><span class="text-primary">Ease</span>
+                <span class="badge bg-primary ms-2 fs-6">Blazor Interactive Preview</span>
+            </a>
+            <div class="d-flex align-items-center ms-auto gap-3 text-light small">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-person-circle fs-5 me-2 text-primary"></i>
+                    <span>Mustofa (Active Session)</span>
+                </div>
+                <span class="badge bg-success">Online</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sub Navigation Tabs -->
+    <div class="bg-white border-bottom shadow-sm">
+        <div class="container py-2">
+            <ul class="nav nav-pills gap-2" id="navTabs">
+                <li class="nav-item">
+                    <button class="nav-link active fw-semibold" id="tab-dashboard" onclick="navigate('dashboard')">
+                        <i class="bi bi-speedometer2 me-1"></i> Dashboard & Events
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-semibold" id="tab-register" onclick="navigate('register')">
+                        <i class="bi bi-pencil-square me-1"></i> Registration Form
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link fw-semibold" id="tab-attendance" onclick="navigate('attendance')">
+                        <i class="bi bi-person-check me-1"></i> Attendance Tracker
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container py-4 flex-grow-1">
+
+        <!-- VIEW 1: DASHBOARD & EVENTS -->
+        <section id="view-dashboard">
+            <div class="p-4 p-md-5 mb-4 bg-white rounded-3 shadow-sm border border-light">
+                <span class="badge bg-primary bg-opacity-10 text-primary mb-2 px-3 py-2 fw-semibold">
+                    <i class="bi bi-robot me-1"></i> Coursera Assignment Project: EventEase
+                </span>
+                <h1 class="display-6 fw-bold text-dark">Blazor Event Management App</h1>
+                <p class="text-muted lead fs-6">
+                    Aplikasi ini mendemonstrasikan Blazor Components, Two-Way Data Binding, Routing, Validasi Form, dan State Management yang dibuat dengan panduan Microsoft Copilot.
+                </p>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3 bg-white d-flex flex-row align-items-center">
+                        <div class="p-3 bg-primary bg-opacity-10 text-primary rounded-3 me-3">
+                            <i class="bi bi-calendar3 fs-3"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Total Events</small>
+                            <h3 class="fw-bold mb-0" id="stat-total-events">3</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3 bg-white d-flex flex-row align-items-center">
+                        <div class="p-3 bg-success bg-opacity-10 text-success rounded-3 me-3">
+                            <i class="bi bi-people-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Registered Attendees</small>
+                            <h3 class="fw-bold mb-0" id="stat-total-attendees">4</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm p-3 bg-white d-flex flex-row align-items-center">
+                        <div class="p-3 bg-warning bg-opacity-10 text-warning rounded-3 me-3">
+                            <i class="bi bi-check-circle-fill fs-3"></i>
+                        </div>
+                        <div>
+                            <small class="text-muted">Check-In Ratio</small>
+                            <h3 class="fw-bold mb-0" id="stat-checkin-ratio">50%</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Cards Grid -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">Event Cards (Dukungan Two-Way Data Binding)</h4>
+                <small class="text-muted">Klik ikon pensil ✏️ di tiap kartu untuk tes live edit data!</small>
+            </div>
+
+            <div class="row row-cols-1 row-cols-md-3 g-4" id="events-grid">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- VIEW 2: REGISTRATION FORM -->
+        <section id="view-register" style="display: none;">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm p-4 p-md-5 bg-white">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3 text-primary">
+                                <i class="bi bi-file-earmark-text-fill fs-3"></i>
+                            </div>
+                            <div>
+                                <h3 class="fw-bold mb-0">Event Registration Form</h3>
+                                <p class="text-muted mb-0">Formulir registrasi dengan validasi input client-side & session store.</p>
+                            </div>
+                        </div>
+                        <hr class="my-3 text-muted" />
+
+                        <div id="reg-success-alert" class="alert alert-success d-none py-4 text-center">
+                            <i class="bi bi-check-circle-fill text-success display-4 mb-2 d-block"></i>
+                            <h4 class="fw-bold">Pendaftaran Berhasil!</h4>
+                            <p id="reg-success-msg"></p>
+                            <button class="btn btn-success me-2" onclick="navigate('attendance')">Buka Attendance Tracker</button>
+                            <button class="btn btn-outline-secondary" onclick="resetForm()">Daftar Lagi</button>
+                        </div>
+
+                        <form id="reg-form" onsubmit="handleRegistration(event)">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nama Lengkap *</label>
+                                    <input type="text" class="form-control" id="reg-name" required value="Mustofa" placeholder="Masukkan nama...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Email *</label>
+                                    <input type="email" class="form-control" id="reg-email" required value="mustofa@example.com" placeholder="nama@email.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nomor WhatsApp / HP *</label>
+                                    <input type="tel" class="form-control" id="reg-phone" required value="+62 812-3456-7890">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Pilih Event *</label>
+                                    <select class="form-select" id="reg-event-select" required>
+                                        <!-- Injected via JS -->
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Jumlah Tiket *</label>
+                                    <input type="number" class="form-control" id="reg-tickets" min="1" max="5" value="1" required>
+                                    <small class="text-muted">Maksimal 5 tiket per sesi.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Catatan Khusus</label>
+                                    <input type="text" class="form-control" id="reg-notes" placeholder="Permintaan khusus/kursi...">
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" id="reg-terms" required checked>
+                                        <label class="form-check-label small" for="reg-terms">
+                                            Saya menyetujui syarat & ketentuan event EventEase.
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+                                        <i class="bi bi-send-check me-2"></i> Submit Registrasi Event
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: ATTENDANCE TRACKER -->
+        <section id="view-attendance" style="display: none;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1">Live Attendance Tracker</h3>
+                    <p class="text-muted mb-0">Presensi kehadiran real-time dengan tombol toggle check-in.</p>
+                </div>
+                <button class="btn btn-primary" onclick="navigate('register')">
+                    <i class="bi bi-plus-circle me-1"></i> Tambah Peserta Baru
+                </button>
+            </div>
+
+            <!-- Table of Attendees -->
+            <div class="card border-0 shadow-sm overflow-hidden bg-white">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="py-3 ps-4">Nama Peserta</th>
+                                <th class="py-3">Email</th>
+                                <th class="py-3">Event</th>
+                                <th class="py-3 text-center">Tiket</th>
+                                <th class="py-3">Status</th>
+                                <th class="py-3 text-end pe-4">Aksi Presensi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-table-body">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white-50 py-3 mt-auto">
+        <div class="container text-center small">
+            <p class="mb-0">&copy; 2026 EventEase Blazor Application - Built with Microsoft Copilot Assistance.</p>
+        </div>
+    </footer>
+
+    <script>
+        // State Store mimicking EventSessionStateService
+        let events = [
+            {
+                id: 1,
+                title: "Global Tech Innovation Summit 2026",
+                desc: "Explore breakthrough advancements in artificial intelligence, cloud architectures, and modern web application frameworks.",
+                date: "Senin, 14 Des 2026 - 09:00",
+                location: "Tech City Arena & Virtual Hall A",
+                category: "Technology",
+                capacity: 150,
+                registered: 125,
+                img: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 2,
+                title: "Blazor Fullstack Masterclass with Microsoft Copilot",
+                desc: "Accelerate modern C# full-stack development using Blazor WebAssembly and AI pair programming workflows.",
+                date: "Jumat, 21 Des 2026 - 14:00",
+                location: "Online Interactive Stream",
+                category: "Workshop",
+                capacity: 80,
+                registered: 65,
+                img: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&auto=format&fit=crop&q=80"
+            },
+            {
+                id: 3,
+                title: "UI/UX Architecture & Modern Design Systems",
+                desc: "Building accessible, high-performance user interfaces and responsive layouts for enterprise web applications.",
+                date: "Kamis, 28 Des 2026 - 10:00",
+                location: "Design Lab Auditorium, Floor 3",
+                category: "Design",
+                capacity: 60,
+                registered: 45,
+                img: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=600&auto=format&fit=crop&q=80"
+            }
+        ];
+
+        let attendees = [
+            { id: 1, name: "Mustofa", email: "mustofa@coursera.user", eventTitle: "Global Tech Innovation Summit 2026", tickets: 2, checkedIn: true },
+            { id: 2, name: "Sarah Jenkins", email: "sarah.j@example.com", eventTitle: "Global Tech Innovation Summit 2026", tickets: 1, checkedIn: false },
+            { id: 3, name: "David Chen", email: "david.c@example.com", eventTitle: "Blazor Fullstack Masterclass with Microsoft Copilot", tickets: 1, checkedIn: true },
+            { id: 4, name: "Aisha Patel", email: "aisha.p@example.com", eventTitle: "UI/UX Architecture & Modern Design Systems", tickets: 1, checkedIn: false }
+        ];
+
+        let editingCardId = null;
+
+        function renderEvents() {
+            const grid = document.getElementById('events-grid');
+            grid.innerHTML = '';
+
+            events.forEach(ev => {
+                const isEditing = editingCardId === ev.id;
+                const available = Math.max(0, ev.capacity - ev.registered);
+                const isSoldOut = available === 0;
+                const percent = Math.min(100, Math.round((ev.registered / ev.capacity) * 100));
+
+                const cardCol = document.createElement('div');
+                cardCol.className = 'col';
+                cardCol.innerHTML = `
+                    <div class="card h-100 shadow-sm border-0 event-card">
+                        <div class="position-relative">
+                            <img src="${ev.img}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="${ev.title}">
+                            <span class="badge bg-primary position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill shadow-sm">${ev.category}</span>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            ${isEditing ? `
+                                <div class="p-2 bg-light border rounded mb-3">
+                                    <small class="text-primary fw-bold d-block mb-1">
+                                        <i class="bi bi-pencil-square"></i> Two-Way Data Binding Edit:
+                                    </small>
+                                    <label class="form-label small mb-0">Judul Event:</label>
+                                    <input type="text" class="form-control form-control-sm mb-2" value="${ev.title}" oninput="updateEventProperty(${ev.id}, 'title', this.value)">
+                                    <label class="form-label small mb-0">Lokasi:</label>
+                                    <input type="text" class="form-control form-control-sm mb-2" value="${ev.location}" oninput="updateEventProperty(${ev.id}, 'location', this.value)">
+                                    <label class="form-label small mb-0">Kapasitas Kursi:</label>
+                                    <input type="number" class="form-control form-control-sm mb-2" value="${ev.capacity}" onchange="updateEventProperty(${ev.id}, 'capacity', parseInt(this.value))">
+                                    <button class="btn btn-sm btn-success w-100" onclick="toggleEditCard(${ev.id})"><i class="bi bi-check-lg"></i> Simpan</button>
+                                </div>
+                            ` : `
+                                <h5 class="card-title fw-bold text-dark mb-2">${ev.title}</h5>
+                                <p class="card-text text-muted small flex-grow-1">${ev.desc}</p>
+                            `}
+
+                            <ul class="list-unstyled small mb-3">
+                                <li class="mb-1 text-secondary"><i class="bi bi-calendar3 me-2 text-primary"></i>${ev.date}</li>
+                                <li class="mb-1 text-secondary"><i class="bi bi-geo-alt-fill me-2 text-danger"></i>${ev.location}</li>
+                                <li class="mb-1 text-secondary d-flex justify-content-between">
+                                    <span><i class="bi bi-people-fill me-2 text-success"></i>${ev.registered} / ${ev.capacity} peserta</span>
+                                    <span class="badge ${isSoldOut ? 'bg-danger' : 'bg-success'}">${isSoldOut ? 'Sold Out' : available + ' sisa kursi'}</span>
+                                </li>
+                            </ul>
+
+                            <div class="progress mb-3" style="height: 6px;">
+                                <div class="progress-bar ${isSoldOut ? 'bg-danger' : 'bg-primary'}" style="width: ${percent}%;"></div>
+                            </div>
+
+                            <div class="mt-auto d-flex gap-2">
+                                <button class="btn btn-primary btn-sm flex-fill" onclick="selectEventForRegister(${ev.id})">
+                                    <i class="bi bi-ticket-perforated me-1"></i> Daftar
+                                </button>
+                                <button class="btn btn-outline-secondary btn-sm" title="Uji Coba Two-Way Binding" onclick="toggleEditCard(${ev.id})">
+                                    <i class="bi ${isEditing ? 'bi-x-lg' : 'bi-pencil'}"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(cardCol);
+            });
+
+            updateStats();
+            populateEventSelect();
+        }
+
+        function toggleEditCard(id) {
+            editingCardId = (editingCardId === id) ? null : id;
+            renderEvents();
+        }
+
+        function updateEventProperty(id, prop, val) {
+            const ev = events.find(e => e.id === id);
+            if (ev) {
+                ev[prop] = val;
+            }
+        }
+
+        function populateEventSelect() {
+            const select = document.getElementById('reg-event-select');
+            select.innerHTML = '<option value="">-- Pilih Event --</option>';
+            events.forEach(ev => {
+                select.innerHTML += `<option value="${ev.id}">${ev.title} (${ev.capacity - ev.registered} sisa kursi)</option>`;
+            });
+        }
+
+        function selectEventForRegister(id) {
+            navigate('register');
+            document.getElementById('reg-event-select').value = id;
+        }
+
+        function renderAttendance() {
+            const tbody = document.getElementById('attendance-table-body');
+            tbody.innerHTML = '';
+
+            attendees.forEach(a => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="ps-4 fw-semibold text-dark">
+                        <i class="bi bi-person-circle text-secondary me-2"></i> ${a.name}
+                    </td>
+                    <td class="text-muted small">${a.email}</td>
+                    <td class="small"><span class="badge bg-light text-dark border">${a.eventTitle}</span></td>
+                    <td class="text-center fw-bold">${a.tickets}</td>
+                    <td>
+                        <span class="badge ${a.checkedIn ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-warning-subtle text-warning border border-warning-subtle'} px-3 py-1">
+                            <i class="bi ${a.checkedIn ? 'bi-check2-circle' : 'bi-clock'} me-1"></i>
+                            ${a.checkedIn ? 'Checked In' : 'Pending'}
+                        </span>
+                    </td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-sm ${a.checkedIn ? 'btn-outline-danger' : 'btn-success'}" onclick="toggleAttendance(${a.id})">
+                            <i class="bi ${a.checkedIn ? 'bi-arrow-counterclockwise' : 'bi-check-lg'} me-1"></i>
+                            ${a.checkedIn ? 'Undo Check-In' : 'Check In'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateStats();
+        }
+
+        function toggleAttendance(id) {
+            const a = attendees.find(att => att.id === id);
+            if (a) {
+                a.checkedIn = !a.checkedIn;
+                renderAttendance();
+            }
+        }
+
+        function handleRegistration(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const eventId = parseInt(document.getElementById('reg-event-select').value);
+            const tickets = parseInt(document.getElementById('reg-tickets').value);
+
+            const ev = events.find(e => e.id === eventId);
+            if (!ev) return;
+
+            ev.registered += tickets;
+            attendees.unshift({
+                id: Date.now(),
+                name: name,
+                email: email,
+                eventTitle: ev.title,
+                tickets: tickets,
+                checkedIn: false
+            });
+
+            document.getElementById('reg-form').classList.add('d-none');
+            const alert = document.getElementById('reg-success-alert');
+            alert.classList.remove('d-none');
+            document.getElementById('reg-success-msg').innerHTML = `Terima kasih <strong>${name}</strong>! Pendaftaran untuk <strong>${tickets} tiket</strong> di event <em>${ev.title}</em> telah tersimpan.`;
+
+            renderEvents();
+            renderAttendance();
+        }
+
+        function resetForm() {
+            document.getElementById('reg-form').reset();
+            document.getElementById('reg-form').classList.remove('d-none');
+            document.getElementById('reg-success-alert').classList.add('d-none');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total-events').innerText = events.length;
+            document.getElementById('stat-total-attendees').innerText = attendees.length;
+            const checkedCount = attendees.filter(a => a.checkedIn).length;
+            const ratio = attendees.length > 0 ? Math.round((checkedCount / attendees.length) * 100) : 0;
+            document.getElementById('stat-checkin-ratio').innerText = ratio + '%';
+        }
+
+        function navigate(viewName) {
+            document.getElementById('view-dashboard').style.display = viewName === 'dashboard' ? 'block' : 'none';
+            document.getElementById('view-register').style.display = viewName === 'register' ? 'block' : 'none';
+            document.getElementById('view-attendance').style.display = viewName === 'attendance' ? 'block' : 'none';
+
+            document.querySelectorAll('#navTabs .nav-link').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + viewName).classList.add('active');
+        }
+
+        // Initialize
+        renderEvents();
+        renderAttendance();
+    </script>
+</body>
+</html>
