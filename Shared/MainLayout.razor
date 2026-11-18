@@ -1,0 +1,52 @@
+@inherits LayoutComponentBase
+@using EventEase.Services
+@inject EventSessionStateService StateService
+
+<div class="page d-flex flex-column min-vh-100">
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm px-3">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="">
+                <i class="bi bi-calendar2-check-fill me-2 fs-4"></i>
+                <span class="text-white">Event</span><span class="text-primary">Ease</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <NavMenu />
+                <div class="d-flex align-items-center ms-auto gap-3 text-light small">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-person-circle fs-5 me-2 text-primary"></i>
+                        <span>@StateService.CurrentUser</span>
+                    </div>
+                    <span class="badge bg-success">Session Active</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow-1 bg-light py-4">
+        <div class="container">
+            @Body
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white-50 py-3 mt-auto">
+        <div class="container text-center small">
+            <p class="mb-1">&copy; 2026 EventEase Blazor Application - Built with Microsoft Copilot Assistance.</p>
+            <p class="mb-0 text-muted">A Comprehensive Blazor WebAssembly Submission for Coursera Peer-graded Assignment.</p>
+        </div>
+    </footer>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        StateService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        StateService.OnChange -= StateHasChanged;
+    }
+}

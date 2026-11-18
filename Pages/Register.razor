@@ -1,0 +1,175 @@
+@page "/register"
+@using EventEase.Models
+@using EventEase.Services
+@inject EventSessionStateService StateService
+@inject NavigationManager Navigation
+
+<PageTitle>EventEase - Event Registration Form</PageTitle>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm p-4 p-md-5 bg-white">
+            <div class="d-flex align-items-center mb-3">
+                <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3 text-primary">
+                    <i class="bi bi-file-earmark-text-fill fs-3"></i>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-0">Event Registration</h2>
+                    <p class="text-muted mb-0">Validated Blazor EditForm with DataAnnotations & Session State</p>
+                </div>
+            </div>
+
+            <hr class="my-3 text-muted" />
+
+            @if (submissionSuccess)
+            {
+                <div class="alert alert-success border-0 shadow-sm py-4 px-4 text-center">
+                    <i class="bi bi-check-circle-fill text-success display-4 mb-2 d-block"></i>
+                    <h4 class="alert-heading fw-bold">Registration Successful!</h4>
+                    <p class="mb-3">
+                        Thank you, <strong>@model.FullName</strong>. Your booking for 
+                        <strong>@model.NumberOfTickets ticket(s)</strong> has been confirmed and saved to the session state.
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="attendance" class="btn btn-success px-4">
+                            <i class="bi bi-person-check me-1"></i> View Attendance Tracker
+                        </a>
+                        <button class="btn btn-outline-secondary px-4" @onclick="ResetForm">
+                            Register Another Person
+                        </button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> @errorMessage
+                        <button type="button" class="btn-close" @onclick="@(() => errorMessage = null)"></button>
+                    </div>
+                }
+
+                <EditForm Model="@model" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+
+                    <div class="row g-3">
+                        <!-- Full Name Field -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                            <InputText class="form-control" @bind-Value="model.FullName" placeholder="e.g. Mustofa" />
+                            <ValidationMessage For="@(() => model.FullName)" class="text-danger small" />
+                        </div>
+
+                        <!-- Email Field -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                            <InputText class="form-control" @bind-Value="model.Email" placeholder="e.g. name@example.com" />
+                            <ValidationMessage For="@(() => model.Email)" class="text-danger small" />
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                            <InputText class="form-control" @bind-Value="model.PhoneNumber" placeholder="e.g. +62 812-3456-7890" />
+                            <ValidationMessage For="@(() => model.PhoneNumber)" class="text-danger small" />
+                        </div>
+
+                        <!-- Event Selection Dropdown -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Select Event <span class="text-danger">*</span></label>
+                            <InputSelect class="form-select" @bind-Value="model.SelectedEventId">
+                                <option value="0">-- Choose an Event --</option>
+                                @foreach (var ev in StateService.Events)
+                                {
+                                    <option value="@ev.Id" disabled="@ev.IsSoldOut">
+                                        @ev.Title @(ev.IsSoldOut ? " (Sold Out)" : $" ({ev.AvailableSeats} seats left)")
+                                    </option>
+                                }
+                            </InputSelect>
+                            <ValidationMessage For="@(() => model.SelectedEventId)" class="text-danger small" />
+                        </div>
+
+                        <!-- Number of Tickets -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Number of Tickets <span class="text-danger">*</span></label>
+                            <InputNumber class="form-control" @bind-Value="model.NumberOfTickets" min="1" max="5" />
+                            <small class="text-muted">Maximum 5 tickets per user session.</small>
+                            <ValidationMessage For="@(() => model.NumberOfTickets)" class="text-danger small" />
+                        </div>
+
+                        <!-- Special Notes -->
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Session Requests / Notes (Optional)</label>
+                            <InputTextArea class="form-control" rows="3" @bind-Value="model.SessionNotes" placeholder="Dietary restrictions, accessibility requests, or questions..." />
+                        </div>
+
+                        <!-- Terms & Conditions Checkbox -->
+                        <div class="col-12">
+                            <div class="form-check mt-2">
+                                <InputCheckbox class="form-check-input" id="termsCheck" @bind-Value="model.AgreedToTerms" />
+                                <label class="form-check-label small" for="termsCheck">
+                                    I agree to the EventEase Terms of Service and Event Code of Conduct. <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                            <ValidationMessage For="@(() => model.AgreedToTerms)" class="text-danger small" />
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg w-100 shadow-sm">
+                                <i class="bi bi-send-check me-2"></i> Complete Event Registration
+                            </button>
+                        </div>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public int? EventId { get; set; }
+
+    private RegistrationModel model = new();
+    private bool submissionSuccess = false;
+    private string? errorMessage;
+
+    protected override void OnInitialized()
+    {
+        if (EventId.HasValue && EventId.Value > 0)
+        {
+            model.SelectedEventId = EventId.Value;
+        }
+
+        // Prefill default name if session exists
+        if (!string.IsNullOrEmpty(StateService.CurrentUser))
+        {
+            var baseUser = StateService.CurrentUser.Split('(')[0].Trim();
+            model.FullName = baseUser;
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        errorMessage = null;
+        bool registered = StateService.RegisterAttendee(model);
+
+        if (registered)
+        {
+            submissionSuccess = true;
+        }
+        else
+        {
+            errorMessage = "Registration could not be completed: The event may be sold out or insufficient seats remaining.";
+        }
+    }
+
+    private void ResetForm()
+    {
+        model = new RegistrationModel();
+        submissionSuccess = false;
+        errorMessage = null;
+    }
+}
